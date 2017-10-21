@@ -5,7 +5,7 @@ import axios from 'axios'
 import './App.css';
 
 class App extends Component {
-  constructor(){
+  constructor() {
     super();
 
     this.state = {
@@ -16,53 +16,65 @@ class App extends Component {
     this.handleSearch = this.handleSearch.bind(this)
   }
 
-  
-  handleSearch(e){
-    if(e.keyCode === 13){
+
+  handleSearch(e) {
+    if (e.keyCode === 13) {
 
       //01: plug our search string into the request URL
-      axios.get(`https://itunes.apple.com/search?term=`)
-      .then(res => {
+      axios.get(`https://itunes.apple.com/search?term=${this.state.artist}`)
+        .then(res => {
 
-        //02: determine path to the array of results we want and put it on state
-		    this.setState({
-          results: []
+          //02: determine path to the array of results we want and put it on state
+          this.setState({
+            results: res.data.results
+          })
         })
-	    })
     }
   }
 
   handleInput(e) {
-    this.setState({artist: e.target.value})
+    this.setState({ artist: e.target.value })
   }
 
   render() {
-
+    console.log(this.state.results)
     //03: render our array of results using the Results component, and pass in all necessary props
-    const resultsArr = [];
+    const resultsArr = this.state.results.map(item => {
+      return (
+        <Results
+          preview={item.previewUrl}
+          song={item.trackName}
+          artist={item.artistName}
+          collection={item.collectionName}
+          type={item.kind}
+          singlePrice={item.trackPrice}
+          collectionPrice={item.collectionPrice}
+        />
+      )
+    })
 
     return (
       <div className="main-container">
         <div className="search-container">
-         <Logo/>
+          <Logo />
           <input placeholder="Search iTunes"
-                 onChange={this.handleInput}
-                 onKeyDown={this.handleSearch}
-                 value={this.state.artist}/>
+            onChange={this.handleInput}
+            onKeyDown={this.handleSearch}
+            value={this.state.artist} />
         </div>
         <div className="results-container">
           <table>
             <tbody>
-            <tr>
-              <th>Play</th>
-              <th>Song</th>
-              <th>Artist</th>
-              <th>Collection</th>
-              <th>Album Art</th>
-              <th>Type</th>
-              <th>Single Price</th>
-              <th>Collection Price</th>
-            </tr>
+              <tr>
+                <th>Play</th>
+                <th>Song</th>
+                <th>Artist</th>
+                <th>Collection</th>
+                <th>Album Art</th>
+                <th>Type</th>
+                <th>Single Price</th>
+                <th>Collection Price</th>
+              </tr>
               {resultsArr}
             </tbody>
           </table>
